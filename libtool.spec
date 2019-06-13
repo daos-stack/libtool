@@ -1,5 +1,9 @@
 # See the bug #429880
+%if 0%{?fedora} >= 30
 %global gcc_major  %(gcc -dumpversion || echo "666")
+%else
+%global gcc_version  %(gcc -dumpversion || echo "666")
+%endif
 # See rhbz#1193591
 %global automake_version %(set -- `automake --version | head -n 1` ; echo ${4-unknown})
 
@@ -8,7 +12,7 @@
 Summary: The GNU Portable Library Tool
 Name:    libtool
 Version: 2.4.6
-Release: 29%{?dist}
+Release: 29.01%{?dist}
 License: GPLv2+ and LGPLv2+ and GFDL
 URL:     http://www.gnu.org/software/libtool/
 
@@ -41,7 +45,11 @@ Patch100: libtool-nodocs.patch
 # Libtool must be rebuilt whenever a new upstream gcc is built
 # Starting with gcc 7 gcc in Fedora is packaged so that only major
 # number changes need libtool rebuilding.
+%if 0%{?fedora} >= 30
 Requires: gcc(major) = %{gcc_major}
+%else
+Requires: gcc = %{gcc_version}
+%endif
 Requires: autoconf, automake, sed, tar, findutils
 
 %if ! 0%{?_module_build}
@@ -181,6 +189,9 @@ rm -f %{buildroot}%{_libdir}/libltdl.{a,la}
 
 
 %changelog
+* Mon Jun 10 2019 Brian J. Murrell <brian.murrell@intel.com> - 2.4.6-29.01
+- Update to build on EL7
+
 * Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.6-29
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
